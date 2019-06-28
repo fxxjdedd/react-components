@@ -1,14 +1,14 @@
-import { useState, useRef } from 'react'
+import { useState, useRef } from 'react';
 
 export function useReset(): [number, () => void] {
-  const [uid, setUID] = useState(0)
+  const [uid, setUID] = useState(0);
   function reset() {
-    setUID(uid + 1)
+    setUID(uid + 1);
   }
-  return [uid, reset]
+  return [uid, reset];
 }
 
 export function useInitialValue(value: any): any {
-  const initialValue = useRef(value)
-  return initialValue.current
+  const initialValue = useRef(value);
+  return initialValue.current;
 }

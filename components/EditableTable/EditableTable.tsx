@@ -1,22 +1,18 @@
-import React from "react";
-import { Table, Button } from "antd";
-import {
-  EditableTableProps,
-  EditableRecord,
-  EditableColumnProps
-} from "./interface";
-import EditableCell from "./EditableCell";
-import EditableRow from "./EditableRow";
-import { WrappedFormUtils } from "antd/lib/form/Form";
-import { useInitialValue, useReset } from "./util";
+import React from 'react';
+import { Table, Button } from 'antd';
+import { EditableTableProps, EditableRecord, EditableColumnProps } from './interface';
+import EditableCell from './EditableCell';
+import EditableRow from './EditableRow';
+import { WrappedFormUtils } from 'antd/lib/form/Form';
+import { useInitialValue, useReset } from './util';
 
 export const EditableContext = React.createContext<any>(null);
 
 const components = {
   body: {
     row: EditableRow,
-    cell: EditableCell
-  }
+    cell: EditableCell,
+  },
 };
 
 function createRecord(columns: Array<EditableColumnProps>) {
@@ -25,7 +21,7 @@ function createRecord(columns: Array<EditableColumnProps>) {
       const { dataIndex, fieldDecoratorOptions = {} } = column;
       return {
         dataIndex,
-        initialValue: fieldDecoratorOptions.initialValue || null
+        initialValue: fieldDecoratorOptions.initialValue || null,
       };
     })
     .reduce(
@@ -35,7 +31,7 @@ function createRecord(columns: Array<EditableColumnProps>) {
         }
         return item;
       },
-      {} as any
+      {} as any,
     );
 }
 
@@ -69,8 +65,8 @@ function createFunctions<T = EditableRecord>(props: EditableTableProps<T>) {
           record,
           handleSave,
           rowIndex,
-          ...column
-        })
+          ...column,
+        }),
       };
     });
   }
@@ -78,29 +74,23 @@ function createFunctions<T = EditableRecord>(props: EditableTableProps<T>) {
   return {
     handleSave,
     handleAdd,
-    generateColumns
+    generateColumns,
   };
 }
 
-export default React.forwardRef(function EditableTable<
-  T extends EditableRecord
->(props: EditableTableProps<T>, ref: any) {
-  const {
-    columns,
-    dataSource,
-    onDataSync,
-    addText,
-    hideAddBtn,
-    ...restProps
-  } = props;
+export default React.forwardRef(function EditableTable<T extends EditableRecord>(
+  props: EditableTableProps<T>,
+  ref: any,
+) {
+  const { columns, dataSource, onDataSync, addText, hideAddBtn, ...restProps } = props;
 
   const [uid, resetComponent] = useReset();
   const initialDataSource = useInitialValue(dataSource);
 
-  const { handleAdd, generateColumns } = React.useMemo(
-    () => createFunctions(props),
-    [dataSource, onDataSync]
-  );
+  const { handleAdd, generateColumns } = React.useMemo(() => createFunctions(props), [
+    dataSource,
+    onDataSync,
+  ]);
   const generatedColumns = generateColumns<T>(columns);
 
   // 这里的写法是没错的, 因为dataSource会发生变化
@@ -140,21 +130,21 @@ export default React.forwardRef(function EditableTable<
       const newData = dataSource.slice();
       newData.splice(rowIndex, 1);
       onDataSync && onDataSync(newData);
-    }
+    },
   }));
 
   return (
     <div>
-      {!hideAddBtn && <a onClick={handleAdd}>{addText || "+添加"}</a>}
+      {!hideAddBtn && <a onClick={handleAdd}>{addText || '+添加'}</a>}
       <Table
         key={uid}
-        rowClassName={() => "editable-table-row"}
+        rowClassName={() => 'editable-table-row'}
         components={components}
         columns={generatedColumns}
         dataSource={dataSource}
         onRow={(record, index) => {
           return {
-            rowRef: rowRefs[index]
+            rowRef: rowRefs[index],
           };
         }}
         pagination={{ hideOnSinglePage: true }}

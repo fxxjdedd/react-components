@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
-import { EditableRecord } from "./interface";
-import { EditableContext } from "./EditableTable";
-import { Form, Input, Select, Icon } from "antd";
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import { EditableRecord } from './interface';
+import { EditableContext } from './EditableTable';
+import { Form, Input, Select, Icon } from 'antd';
 
 function useEditing(inputRef: any): [boolean, () => void] {
   const [editing, setEditing] = useState(false);
@@ -33,7 +33,7 @@ export default function EditableCell(props: EditableRecord) {
     editElement,
     handleSave,
     rowIndex,
-    alwaysEditing = true
+    alwaysEditing = true,
   } = props;
 
   function save(e: any) {
@@ -51,12 +51,12 @@ export default function EditableCell(props: EditableRecord) {
       case Input:
         return {
           onBlur: save,
-          onPressEnter: save
+          onPressEnter: save,
         };
       case Select:
       default:
         return {
-          onBlur: save
+          onBlur: save,
         };
     }
   }
@@ -68,9 +68,7 @@ export default function EditableCell(props: EditableRecord) {
             // 合并options
             const decoratorOptions = {
               ...fieldDecoratorOptions,
-              ...(record[dataIndex] != null
-                ? { initialValue: record[dataIndex] }
-                : {})
+              ...(record[dataIndex] != null ? { initialValue: record[dataIndex] } : {}),
             };
 
             const editProps = generateEditProps();
@@ -79,7 +77,7 @@ export default function EditableCell(props: EditableRecord) {
               alwaysEditing || editing ? (
                 React.cloneElement(editElement, {
                   ref: inputRef,
-                  ...editProps
+                  ...editProps,
                 })
               ) : (
                 <div
@@ -96,9 +94,7 @@ export default function EditableCell(props: EditableRecord) {
 
             return (
               <Form.Item style={{ margin: 0 }}>
-                {form.getFieldDecorator(dataIndex, decoratorOptions)(
-                  formContent
-                )}
+                {form.getFieldDecorator(dataIndex, decoratorOptions)(formContent)}
               </Form.Item>
             );
           })()
