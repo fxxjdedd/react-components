@@ -1,0 +1,19 @@
+{
+  "name": "@futengda/react-components",
+  "version": "1.0.0",
+  "description": "React components based on Antd",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@v9.git.n.xiaomi.com:futengda/react-components.git"
+  },
+  "keywords": [
+    "react",
+    "component"
+  ],
+  "author": "futengda@xiaomi.com",
+  "license": "MIT"
+}
