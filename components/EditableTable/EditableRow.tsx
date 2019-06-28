@@ -1,5 +1,5 @@
 import React, { useImperativeHandle } from 'react';
-import { EditableContext } from './EditableTable';
+import { EditableContext } from '../context';
 import { Form } from 'antd';
 export default Form.create()(function EditableRow({ form, ...props }: any) {
   const { rowRef } = props;

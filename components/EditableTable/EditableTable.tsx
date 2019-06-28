@@ -6,8 +6,6 @@ import EditableRow from './EditableRow';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
 import { useInitialValue, useReset } from '../util';
 
-export const EditableContext = React.createContext<any>(null);
-
 const components = {
   body: {
     row: EditableRow,

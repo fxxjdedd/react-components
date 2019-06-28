@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { EditableRecord } from './interface';
-import { EditableContext } from './EditableTable';
+import { EditableContext } from '../context';
 import { Form, Input, Select, Icon } from 'antd';
 
 function useEditing(inputRef: any): [boolean, () => void] {
