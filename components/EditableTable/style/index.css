@@ -1,0 +1,19 @@
+.editable-table-cell-value-wrap {
+  padding: 5px 12px;
+  line-height: 1.5;
+  cursor: pointer;
+}
+.editable-table-cell-value-wrap > .anticon-edit {
+  display: none;
+}
+
+.editable-table-row:hover .editable-table-cell-value-wrap {
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 4px 11px;
+}
+
+.editable-table-row:hover .anticon-edit {
+  display: inline;
+  margin-right: 5px;
+}
