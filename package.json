@@ -6,7 +6,17 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "prettier -c --write **/*",
-    "lint-staged": "lint-staged"
+    "lint-staged": "lint-staged",
+    "tsc": "tsc",
+    "dist": "antd-tools run dist",
+    "compile": "antd-tools run compile",
+    "clean": "antd-tools run clean",
+    "start": "antd-tools run start",
+    "site": "antd-tools run site",
+    "deploy": "antd-tools run update-self && antd-tools run deploy",
+    "just-deploy": "antd-tools run just-deploy",
+    "pub": "antd-tools run update-self && antd-tools run pub",
+    "prepublish": "antd-tools run guard"
   },
   "pre-commit": [
     "lint-staged"
@@ -29,6 +39,7 @@
   "license": "MIT",
   "dependencies": {
     "antd": "^3.19.8",
+    "antd-tools": "^7.6.0",
     "react": "^16.8.6"
   },
   "devDependencies": {

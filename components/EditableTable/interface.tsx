@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { ColumnProps, TableProps } from 'antd/es/table';
 import { GetFieldDecoratorOptions } from 'antd/es/form/Form';
-import { Input, Select } from 'antd';
 
 export type EditableRecord = any;
 

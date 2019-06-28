@@ -1,10 +1,10 @@
 import React from 'react';
-import { Table, Button } from 'antd';
+import { Table } from 'antd';
 import { EditableTableProps, EditableRecord, EditableColumnProps } from './interface';
 import EditableCell from './EditableCell';
 import EditableRow from './EditableRow';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
-import { useInitialValue, useReset } from './util';
+import { useInitialValue, useReset } from '../util';
 
 export const EditableContext = React.createContext<any>(null);
 
@@ -142,7 +142,7 @@ export default React.forwardRef(function EditableTable<T extends EditableRecord>
         components={components}
         columns={generatedColumns}
         dataSource={dataSource}
-        onRow={(record, index) => {
+        onRow={(_, index) => {
           return {
             rowRef: rowRefs[index],
           };
