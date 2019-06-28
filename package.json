@@ -1,6 +1,6 @@
 {
   "name": "@futengda/react-components",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "React components based on Antd",
   "module": "./components/index.js",
   "scripts": {
