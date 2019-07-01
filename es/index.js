@@ -128,21 +128,29 @@ function createRecord(columns) {
         return item;
     }, {});
 }
-function createFunctions(props, controlledDataSource) {
-    const { dataSource, columns, onDataSync, onRecordSync, controlled } = props;
+function createFunctions(props, controlledTuple) {
+    const [controlledDataSource, setControlledDataSource] = controlledTuple;
+    const { dataSource, columns, onDataSync, onRecordSync, controlled = true } = props;
     function sync(data, rowIndex) {
-        if (controlled) {
+        if (rowIndex != null) {
             data = data;
-            controlledDataSource.splice(0, controlledDataSource.length);
-            controlledDataSource.push(...data);
-        }
-        else if (rowIndex != null) {
-            data = data;
-            onRecordSync && onRecordSync(data, rowIndex);
+            if (!controlled) {
+                const newData = controlledDataSource.slice();
+                newData[rowIndex] = data;
+                setControlledDataSource(newData);
+            }
+            else {
+                onRecordSync && onRecordSync(data, rowIndex);
+            }
         }
         else {
             data = data;
-            onDataSync && onDataSync(data);
+            if (!controlled) {
+                setControlledDataSource(data);
+            }
+            else {
+                onDataSync && onDataSync(data);
+            }
         }
     }
     function handleSave(newRecord, rowIndex) {
@@ -176,12 +184,14 @@ function createFunctions(props, controlledDataSource) {
     };
 }
 var EditableTable = React.forwardRef(function EditableTable(props, ref) {
-    const { columns, dataSource, onDataSync, addText, hideAddBtn } = props, restProps = __rest(props, ["columns", "dataSource", "onDataSync", "addText", "hideAddBtn"]);
+    const { columns, dataSource, onDataSync, addText, hideAddBtn, controlled } = props, restProps = __rest(props, ["columns", "dataSource", "onDataSync", "addText", "hideAddBtn", "controlled"]);
     const [uid, resetComponent] = useReset();
     const initialDataSource = useInitialValue(dataSource);
     // slice一份儿dataSource作为controlled state
-    const controlledDataSource = useInitialValue(dataSource.slice());
-    const { handleAdd, generateColumns, sync } = React.useMemo(() => createFunctions(props, controlledDataSource), [dataSource, onDataSync]);
+    const controlledTuple = useState(dataSource.slice());
+    const [controlledDataSource] = controlledTuple;
+    const tableDataSource = controlled ? dataSource : controlledDataSource;
+    const { handleAdd, generateColumns, sync } = createFunctions(props, controlledTuple);
     const generatedColumns = generateColumns(columns);
     // 这里的写法是没错的, 因为dataSource会发生变化
     // 如果使用useRef(dataSource.map(_ => React.createRef()),那么它的结果只会是一个空数组(初始值)
@@ -228,7 +238,7 @@ var EditableTable = React.forwardRef(function EditableTable(props, ref) {
     }));
     return (React.createElement("div", null,
         !hideAddBtn && React.createElement("a", { onClick: handleAdd }, addText || '+添加'),
-        React.createElement(Table, Object.assign({ key: uid, rowClassName: () => 'editable-table-row', components: components, columns: generatedColumns, dataSource: dataSource, onRow: (_, index) => {
+        React.createElement(Table, Object.assign({ key: uid, rowClassName: () => 'editable-table-row', components: components, columns: generatedColumns, dataSource: tableDataSource, onRow: (_, index) => {
                 return {
                     rowRef: rowRefs[index],
                 };
