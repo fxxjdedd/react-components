@@ -39,12 +39,13 @@ function createFunctions<T = EditableRecord>(
 ) {
   const [controlledDataSource, setControlledDataSource] = controlledTuple;
   const { dataSource, columns, onDataSync, onRecordSync, controlled = true } = props;
+  const tableDataSource = controlled ? dataSource : controlledDataSource;
 
   function sync(data: T | Array<T>, rowIndex?: number) {
     if (rowIndex != null) {
       data = data as T;
       if (!controlled) {
-        const newData = controlledDataSource.slice();
+        const newData = tableDataSource.slice();
         newData[rowIndex] = data;
         setControlledDataSource(newData);
       } else {
@@ -61,7 +62,7 @@ function createFunctions<T = EditableRecord>(
   }
 
   function handleSave(newRecord: T, rowIndex: number) {
-    const newData = [...dataSource];
+    const newData = [...tableDataSource];
     newData.splice(rowIndex, 1, newRecord);
     sync(newRecord, rowIndex);
     sync(newData);
@@ -69,10 +70,10 @@ function createFunctions<T = EditableRecord>(
 
   function handleAdd() {
     const newRecord = createRecord(columns);
-    const newData = dataSource.slice();
+    const newData = tableDataSource.slice();
     newData.push(newRecord);
 
-    sync(newRecord, dataSource.length);
+    sync(newRecord, tableDataSource.length);
     sync(newData);
   }
 
@@ -112,15 +113,16 @@ export default React.forwardRef(function EditableTable<T extends EditableRecord>
   // slice一份儿dataSource作为controlled state
   const controlledTuple = useState(dataSource.slice());
   const [controlledDataSource] = controlledTuple;
+
+  // 从这里开始，统一使用tableDataSource来表示真实的dataSource
   const tableDataSource = controlled ? dataSource : controlledDataSource;
 
   const { handleAdd, generateColumns, sync } = createFunctions(props, controlledTuple);
-
   const generatedColumns = generateColumns<T>(columns);
 
   // 这里的写法是没错的, 因为dataSource会发生变化
   // 如果使用useRef(dataSource.map(_ => React.createRef()),那么它的结果只会是一个空数组(初始值)
-  const rowRefs = dataSource.map(_ => React.createRef<WrappedFormUtils>());
+  const rowRefs = tableDataSource.map(_ => React.createRef<WrappedFormUtils>());
 
   React.useImperativeHandle(ref, () => ({
     validateTableFields(handler: (errors?: any[] | null, values?: any) => void) {
@@ -156,7 +158,7 @@ export default React.forwardRef(function EditableTable<T extends EditableRecord>
       handleAdd();
     },
     deleteRow(rowIndex: number) {
-      const newData = dataSource.slice();
+      const newData = tableDataSource.slice();
       newData.splice(rowIndex, 1);
       sync(newData);
     },
