@@ -67,3 +67,13 @@ const dataSource = []
 | editable | table-cell 是否可编辑 | boolean | false |
 | alwaysEditing | table-cell 是否一直处于可编辑状态，如果为 false 需要点击一下才会切换到编辑状态 | boolean | false |
 | editElement | 必填用于编辑字段内容的组件，目前只支持 `<Input /> or <Select />` | ReactElement | `<Input />` |
+
+### Table Ref
+
+| 参数 | 说明 | 类型 | 默认值 |
+| --- | --- | --- | --- |
+| validateTableFields | 用法同 validateFields，验证 table 中所有表单项 | --- | --- |
+| resetTableFields | 用法同 resetFields，重置 table 中所有表单项 | --- | --- |
+| resetTable | 有时候会遇到 resetFields 依旧无法重置的情况，使用 resetTable 直接重置整个 table 组件。同时会触发 onDataSync。 | () => void | --- |
+| addRow | 如果设置了`hideAddBtn=true`则可以通过这个方法添加表的行 | --- | --- |
+| deleteRow | 通过传入 rowIndex 来删除行，同时触发 onDataSync | (rowIndex) => void | --- |
