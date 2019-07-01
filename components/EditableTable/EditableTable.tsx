@@ -37,19 +37,24 @@ function createFunctions<T = EditableRecord>(
   props: EditableTableProps<T>,
   controlledDataSource: Array<T>,
 ) {
-  const { dataSource, columns, onDataSync, onRecordSync, controlled } = props;
+  const { dataSource, columns, onDataSync, onRecordSync, controlled = true } = props;
 
   function sync(data: T | Array<T>, rowIndex?: number) {
-    if (controlled) {
-      data = data as Array<T>;
-      controlledDataSource.splice(0, controlledDataSource.length);
-      controlledDataSource.push(...data);
-    } else if (rowIndex != null) {
+    if (rowIndex != null) {
       data = data as T;
-      onRecordSync && onRecordSync(data, rowIndex);
+      if (!controlled) {
+        controlledDataSource[rowIndex] = data;
+      } else {
+        onRecordSync && onRecordSync(data, rowIndex);
+      }
     } else {
       data = data as Array<T>;
-      onDataSync && onDataSync(data);
+      if (!controlled) {
+        controlledDataSource.splice(0, controlledDataSource.length);
+        controlledDataSource.push(...data);
+      } else {
+        onDataSync && onDataSync(data);
+      }
     }
   }
 

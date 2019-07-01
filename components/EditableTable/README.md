@@ -51,7 +51,7 @@ const dataSource = []
 | 参数 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
 | 所有 antd table 的参数 | - | - | - |
-| controlled | 是否使用控制型组件，如果`controlled=true`，那么将不会触发 onDataSync 和 onRecord，同时请通过 validateTableFields 来获取最新的 dataSource 数据 | boolean | false |
+| controlled | 是否使用控制型组件，如果`controlled=false`，那么将不会触发 onDataSync 和 onRecord，同时请通过 validateTableFields 来获取最新的 dataSource 数据 | boolean | true |
 | columns | 新增几个配置属性，详情见 columns | - | - |
 | addText | 自带的新增 row 的 button 的 text | string or ReactNode | +添加 |
 | hideAddBtn | 是否隐藏自带的新增 row 的 button，使用自定义的增加方式 | boolean | false |
