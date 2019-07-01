@@ -131,11 +131,12 @@ function createRecord(columns) {
 function createFunctions(props, controlledTuple) {
     const [controlledDataSource, setControlledDataSource] = controlledTuple;
     const { dataSource, columns, onDataSync, onRecordSync, controlled = true } = props;
+    const tableDataSource = controlled ? dataSource : controlledDataSource;
     function sync(data, rowIndex) {
         if (rowIndex != null) {
             data = data;
             if (!controlled) {
-                const newData = controlledDataSource.slice();
+                const newData = tableDataSource.slice();
                 newData[rowIndex] = data;
                 setControlledDataSource(newData);
             }
@@ -154,16 +155,16 @@ function createFunctions(props, controlledTuple) {
         }
     }
     function handleSave(newRecord, rowIndex) {
-        const newData = [...dataSource];
+        const newData = [...tableDataSource];
         newData.splice(rowIndex, 1, newRecord);
         sync(newRecord, rowIndex);
         sync(newData);
     }
     function handleAdd() {
         const newRecord = createRecord(columns);
-        const newData = dataSource.slice();
+        const newData = tableDataSource.slice();
         newData.push(newRecord);
-        sync(newRecord, dataSource.length);
+        sync(newRecord, tableDataSource.length);
         sync(newData);
     }
     function generateColumns(columns) {
@@ -190,12 +191,13 @@ var EditableTable = React.forwardRef(function EditableTable(props, ref) {
     // slice一份儿dataSource作为controlled state
     const controlledTuple = useState(dataSource.slice());
     const [controlledDataSource] = controlledTuple;
+    // 从这里开始，统一使用tableDataSource来表示真实的dataSource
     const tableDataSource = controlled ? dataSource : controlledDataSource;
     const { handleAdd, generateColumns, sync } = createFunctions(props, controlledTuple);
     const generatedColumns = generateColumns(columns);
     // 这里的写法是没错的, 因为dataSource会发生变化
     // 如果使用useRef(dataSource.map(_ => React.createRef()),那么它的结果只会是一个空数组(初始值)
-    const rowRefs = dataSource.map(_ => React.createRef());
+    const rowRefs = tableDataSource.map(_ => React.createRef());
     React.useImperativeHandle(ref, () => ({
         validateTableFields(handler) {
             const errors = [];
@@ -231,7 +233,7 @@ var EditableTable = React.forwardRef(function EditableTable(props, ref) {
             handleAdd();
         },
         deleteRow(rowIndex) {
-            const newData = dataSource.slice();
+            const newData = tableDataSource.slice();
             newData.splice(rowIndex, 1);
             sync(newData);
         },
