@@ -138,7 +138,7 @@ export default React.forwardRef(function EditableTable<T extends EditableRecord>
       if (errors.length) {
         handler(errors);
       } else {
-        handler(null, initialDataSource);
+        handler(null, tableDataSource);
       }
     },
     // 这个方法的语义是: 清空所有table-row中form的field值
