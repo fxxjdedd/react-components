@@ -30,7 +30,7 @@ export default function EditableCell(props: EditableRecord) {
     dataIndex,
     record,
     fieldDecoratorOptions,
-    editElement,
+    editElement = <Input />,
     handleSave,
     rowIndex,
     alwaysEditing = true,
