@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Table } from 'antd';
 import { EditableTableProps, EditableRecord, EditableColumnProps } from './interface';
 import EditableCell from './EditableCell';
@@ -35,23 +35,25 @@ function createRecord(columns: Array<EditableColumnProps>) {
 
 function createFunctions<T = EditableRecord>(
   props: EditableTableProps<T>,
-  controlledDataSource: Array<T>,
+  controlledTuple: Array<any>,
 ) {
+  const [controlledDataSource, setControlledDataSource] = controlledTuple;
   const { dataSource, columns, onDataSync, onRecordSync, controlled = true } = props;
 
   function sync(data: T | Array<T>, rowIndex?: number) {
     if (rowIndex != null) {
       data = data as T;
       if (!controlled) {
-        controlledDataSource[rowIndex] = data;
+        const newData = controlledDataSource.slice();
+        newData[rowIndex] = data;
+        setControlledDataSource(newData);
       } else {
         onRecordSync && onRecordSync(data, rowIndex);
       }
     } else {
       data = data as Array<T>;
       if (!controlled) {
-        controlledDataSource.splice(0, controlledDataSource.length);
-        controlledDataSource.push(...data);
+        setControlledDataSource(data);
       } else {
         onDataSync && onDataSync(data);
       }
@@ -103,17 +105,17 @@ export default React.forwardRef(function EditableTable<T extends EditableRecord>
   props: EditableTableProps<T>,
   ref: any,
 ) {
-  const { columns, dataSource, onDataSync, addText, hideAddBtn, ...restProps } = props;
+  const { columns, dataSource, onDataSync, addText, hideAddBtn, controlled, ...restProps } = props;
 
   const [uid, resetComponent] = useReset();
   const initialDataSource = useInitialValue(dataSource);
   // slice一份儿dataSource作为controlled state
-  const controlledDataSource = useInitialValue(dataSource.slice());
+  const controlledTuple = useState(dataSource.slice());
+  const [controlledDataSource] = controlledTuple;
+  const tableDataSource = controlled ? dataSource : controlledDataSource;
 
-  const { handleAdd, generateColumns, sync } = React.useMemo(
-    () => createFunctions(props, controlledDataSource),
-    [dataSource, onDataSync],
-  );
+  const { handleAdd, generateColumns, sync } = createFunctions(props, controlledTuple);
+
   const generatedColumns = generateColumns<T>(columns);
 
   // 这里的写法是没错的, 因为dataSource会发生变化
@@ -168,7 +170,7 @@ export default React.forwardRef(function EditableTable<T extends EditableRecord>
         rowClassName={() => 'editable-table-row'}
         components={components}
         columns={generatedColumns}
-        dataSource={dataSource}
+        dataSource={tableDataSource}
         onRow={(_, index) => {
           return {
             rowRef: rowRefs[index],
