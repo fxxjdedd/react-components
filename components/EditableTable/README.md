@@ -9,6 +9,8 @@
 ## 如何使用
 
 ```jsx
+// usage1: controlled-component
+
 const columns = [
   {
     title: '字段名称',
@@ -41,6 +43,27 @@ const dataSource = []
     // here we need sync newDataSource to state
     // using setState or hooks
   }}
+></EditableTable>
+```
+
+```jsx
+// usage2: uncontrolled-component
+const tableRef = useRef()
+
+// when need to commit
+handleSave() {
+  const { validateTableFields } = tableRef.current
+  validateTableFields((errors, values) => {
+    if(!errors) {
+      // use values
+    }
+  })
+}
+
+<EditableTable
+  ref={tableRef}
+  columns={columns}
+  dataSource={dataSource}
 ></EditableTable>
 ```
 
