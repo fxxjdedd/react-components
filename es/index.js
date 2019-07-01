@@ -1,5 +1,5 @@
 import React, { useRef, useContext, useState, useEffect, useImperativeHandle } from 'react';
-import { Icon, Form, Input, Select, Table } from 'antd';
+import { Input, Icon, Form, Select, Table } from 'antd';
 
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation. All rights reserved.
@@ -47,7 +47,7 @@ function EditableCell(props) {
     const inputRef = useRef(null);
     const form = useContext(EditableContext);
     const [editing, toggleEdit] = useEditing(inputRef);
-    const { editable, children, dataIndex, record, fieldDecoratorOptions, editElement, handleSave, rowIndex, alwaysEditing = true, } = props;
+    const { editable, children, dataIndex, record, fieldDecoratorOptions, editElement = React.createElement(Input, null), handleSave, rowIndex, alwaysEditing = true, } = props;
     function save(e) {
         form.validateFields((error, values) => {
             if (error && error[e.currentTarget.id]) {
@@ -128,20 +128,35 @@ function createRecord(columns) {
         return item;
     }, {});
 }
-function createFunctions(props) {
-    const { dataSource, columns, onDataSync, onRecordSync } = props;
+function createFunctions(props, controlledDataSource) {
+    const { dataSource, columns, onDataSync, onRecordSync, controlled } = props;
+    function sync(data, rowIndex) {
+        if (controlled) {
+            data = data;
+            controlledDataSource.splice(0, controlledDataSource.length);
+            controlledDataSource.push(...data);
+        }
+        else if (rowIndex != null) {
+            data = data;
+            onRecordSync && onRecordSync(data, rowIndex);
+        }
+        else {
+            data = data;
+            onDataSync && onDataSync(data);
+        }
+    }
     function handleSave(newRecord, rowIndex) {
         const newData = [...dataSource];
         newData.splice(rowIndex, 1, newRecord);
-        onRecordSync && onRecordSync(newRecord, rowIndex);
-        onDataSync && onDataSync(newData);
+        sync(newRecord, rowIndex);
+        sync(newData);
     }
     function handleAdd() {
         const newRecord = createRecord(columns);
         const newData = dataSource.slice();
         newData.push(newRecord);
-        onRecordSync && onRecordSync(newRecord, dataSource.length);
-        onDataSync && onDataSync(newData);
+        sync(newRecord, dataSource.length);
+        sync(newData);
     }
     function generateColumns(columns) {
         return columns.map(column => {
@@ -157,16 +172,16 @@ function createFunctions(props) {
         handleSave,
         handleAdd,
         generateColumns,
+        sync,
     };
 }
 var EditableTable = React.forwardRef(function EditableTable(props, ref) {
     const { columns, dataSource, onDataSync, addText, hideAddBtn } = props, restProps = __rest(props, ["columns", "dataSource", "onDataSync", "addText", "hideAddBtn"]);
     const [uid, resetComponent] = useReset();
     const initialDataSource = useInitialValue(dataSource);
-    const { handleAdd, generateColumns } = React.useMemo(() => createFunctions(props), [
-        dataSource,
-        onDataSync,
-    ]);
+    // slice一份儿dataSource作为controlled state
+    const controlledDataSource = useInitialValue(dataSource.slice());
+    const { handleAdd, generateColumns, sync } = React.useMemo(() => createFunctions(props, controlledDataSource), [dataSource, onDataSync]);
     const generatedColumns = generateColumns(columns);
     // 这里的写法是没错的, 因为dataSource会发生变化
     // 如果使用useRef(dataSource.map(_ => React.createRef()),那么它的结果只会是一个空数组(初始值)
@@ -182,7 +197,12 @@ var EditableTable = React.forwardRef(function EditableTable(props, ref) {
                     }
                 });
             });
-            handler(errors.length ? errors : null);
+            if (errors.length) {
+                handler(errors);
+            }
+            else {
+                handler(null, initialDataSource);
+            }
         },
         // 这个方法的语义是: 清空所有table-row中form的field值
         // 也就是说,如果你默认有一行,然后又加了一行,执行这个方法,不会删掉第二行,而是重置这两行的fields
@@ -195,7 +215,7 @@ var EditableTable = React.forwardRef(function EditableTable(props, ref) {
         // 使用uid重置，但是用户要确保sourceData也被重置了
         resetTable() {
             resetComponent();
-            onDataSync && onDataSync(initialDataSource);
+            sync(initialDataSource);
         },
         addRow() {
             handleAdd();
@@ -203,7 +223,7 @@ var EditableTable = React.forwardRef(function EditableTable(props, ref) {
         deleteRow(rowIndex) {
             const newData = dataSource.slice();
             newData.splice(rowIndex, 1);
-            onDataSync && onDataSync(newData);
+            sync(newData);
         },
     }));
     return (React.createElement("div", null,
