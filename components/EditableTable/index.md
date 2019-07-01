@@ -52,7 +52,7 @@ const dataSource = []
 | --- | --- | --- | --- |
 | 所有 antd table 的参数 | - | - | - |
 | columns | 新增几个配置属性，详情见 columns | - | - |
-| addText | 自带的新增 row 的 button 的 text | string \| ReactNode | +添加 |
+| addText | 自带的新增 row 的 button 的 text | string or ReactNode | +添加 |
 | hideAddBtn | 是否隐藏自带的新增 row 的 button，使用自定义的增加方式 | boolean | false |
 | onDataSync | 每次编辑内容变化都会触发 onDataSync 回调，参数是编辑后的新 dataSource | (newDataSource) => void | null |
 | onRecordSync | 每次编辑内容变化都会触发 onRecordSync 回调，参数是所编辑行的新 Record 以及 rowIndex | (newRecord, rowIndex) => void | null |
@@ -66,4 +66,4 @@ const dataSource = []
 | fieldDecoratorOptions | 同 getFieldDecorator 的第二个参数 | - | - |
 | editable | table-cell 是否可编辑 | boolean | false |
 | alwaysEditing | table-cell 是否一直处于可编辑状态，如果为 false 需要点击一下才会切换到编辑状态 | boolean | false |
-| editElement | 必填用于编辑字段内容的组件，目前只支持`<Input />|<Select />` | ReactElement | `<Input />` |
+| editElement | 必填用于编辑字段内容的组件，目前只支持 `<Input /> or <Select />` | ReactElement | `<Input />` |
