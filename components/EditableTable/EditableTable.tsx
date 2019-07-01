@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Table } from 'antd';
 import { EditableTableProps, EditableRecord, EditableColumnProps } from './interface';
 import EditableCell from './EditableCell';
@@ -33,14 +33,31 @@ function createRecord(columns: Array<EditableColumnProps>) {
     );
 }
 
-function createFunctions<T = EditableRecord>(props: EditableTableProps<T>) {
-  const { dataSource, columns, onDataSync, onRecordSync } = props;
+function createFunctions<T = EditableRecord>(
+  props: EditableTableProps<T>,
+  controlledDataSource: Array<T>,
+) {
+  const { dataSource, columns, onDataSync, onRecordSync, controlled } = props;
+
+  function sync(data: T | Array<T>, rowIndex?: number) {
+    if (controlled) {
+      data = data as Array<T>;
+      controlledDataSource.splice(0, controlledDataSource.length);
+      controlledDataSource.push(...data);
+    } else if (rowIndex != null) {
+      data = data as T;
+      onRecordSync && onRecordSync(data, rowIndex);
+    } else {
+      data = data as Array<T>;
+      onDataSync && onDataSync(data);
+    }
+  }
 
   function handleSave(newRecord: T, rowIndex: number) {
     const newData = [...dataSource];
     newData.splice(rowIndex, 1, newRecord);
-    onRecordSync && onRecordSync(newRecord, rowIndex);
-    onDataSync && onDataSync(newData);
+    sync(newRecord, rowIndex);
+    sync(newData);
   }
 
   function handleAdd() {
@@ -48,8 +65,8 @@ function createFunctions<T = EditableRecord>(props: EditableTableProps<T>) {
     const newData = dataSource.slice();
     newData.push(newRecord);
 
-    onRecordSync && onRecordSync(newRecord, dataSource.length);
-    onDataSync && onDataSync(newData);
+    sync(newRecord, dataSource.length);
+    sync(newData);
   }
 
   function generateColumns<T>(columns: Array<EditableColumnProps<T>>) {
@@ -73,6 +90,7 @@ function createFunctions<T = EditableRecord>(props: EditableTableProps<T>) {
     handleSave,
     handleAdd,
     generateColumns,
+    sync,
   };
 }
 
@@ -84,11 +102,13 @@ export default React.forwardRef(function EditableTable<T extends EditableRecord>
 
   const [uid, resetComponent] = useReset();
   const initialDataSource = useInitialValue(dataSource);
+  // slice一份儿dataSource作为controlled state
+  const controlledDataSource = useInitialValue(dataSource.slice());
 
-  const { handleAdd, generateColumns } = React.useMemo(() => createFunctions(props), [
-    dataSource,
-    onDataSync,
-  ]);
+  const { handleAdd, generateColumns, sync } = React.useMemo(
+    () => createFunctions(props, controlledDataSource),
+    [dataSource, onDataSync],
+  );
   const generatedColumns = generateColumns<T>(columns);
 
   // 这里的写法是没错的, 因为dataSource会发生变化
@@ -96,7 +116,7 @@ export default React.forwardRef(function EditableTable<T extends EditableRecord>
   const rowRefs = dataSource.map(_ => React.createRef<WrappedFormUtils>());
 
   React.useImperativeHandle(ref, () => ({
-    validateTableFields(handler: (errors?: any[] | null) => void) {
+    validateTableFields(handler: (errors?: any[] | null, values?: any) => void) {
       const errors: any[] = [];
       rowRefs.forEach(ref => {
         const form = ref.current;
@@ -106,7 +126,11 @@ export default React.forwardRef(function EditableTable<T extends EditableRecord>
           }
         });
       });
-      handler(errors.length ? errors : null);
+      if (errors.length) {
+        handler(errors);
+      } else {
+        handler(null, initialDataSource);
+      }
     },
     // 这个方法的语义是: 清空所有table-row中form的field值
     // 也就是说,如果你默认有一行,然后又加了一行,执行这个方法,不会删掉第二行,而是重置这两行的fields
@@ -119,7 +143,7 @@ export default React.forwardRef(function EditableTable<T extends EditableRecord>
     // 使用uid重置，但是用户要确保sourceData也被重置了
     resetTable() {
       resetComponent();
-      onDataSync && onDataSync(initialDataSource);
+      sync(initialDataSource);
     },
     addRow() {
       handleAdd();
@@ -127,7 +151,7 @@ export default React.forwardRef(function EditableTable<T extends EditableRecord>
     deleteRow(rowIndex: number) {
       const newData = dataSource.slice();
       newData.splice(rowIndex, 1);
-      onDataSync && onDataSync(newData);
+      sync(newData);
     },
   }));
 

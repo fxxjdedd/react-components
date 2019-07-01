@@ -5,12 +5,13 @@ import { GetFieldDecoratorOptions } from 'antd/es/form/Form';
 export type EditableRecord = any;
 
 export interface EditableTableProps<T = EditableRecord> extends TableProps<T> {
-  onRecordSync?: (newRecord: T, index: number) => void;
-  onDataSync?: (newDataSource: Array<T>) => void;
   columns: Array<EditableColumnProps<T>>;
   dataSource: Array<T>;
   addText?: React.ReactNode;
   hideAddBtn?: boolean;
+  controlled?: boolean;
+  onRecordSync?: (newRecord: T, index: number) => void;
+  onDataSync?: (newDataSource: Array<T>) => void;
 }
 
 // 怎么用ts限定只用Input和Select?
