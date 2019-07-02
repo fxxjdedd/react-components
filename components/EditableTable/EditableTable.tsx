@@ -4,7 +4,7 @@ import { EditableTableProps, EditableRecord, EditableColumnProps } from './inter
 import EditableCell from './EditableCell';
 import EditableRow from './EditableRow';
 import { WrappedFormUtils } from 'antd/lib/form/Form';
-import { useInitialValue, useReset } from '../util';
+import { useInitialValue, useReset } from '@/util';
 
 const components = {
   body: {

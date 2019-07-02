@@ -9,10 +9,11 @@
     "noUnusedLocals": true,
     "noImplicitAny": true,
     "target": "es6",
-    "lib": ["dom", "es2017"]
+    "lib": ["dom", "es2017"],
+    "baseUrl": ".", // 用paths时必填
+    "paths": {
+      "@/*": ["components/*"]
+    }
   },
-  "exclude": ["node_modules", "lib", "es"],
-  "paths": {
-    "@util": "components/util"
-  }
+  "include": ["components"]
 }

@@ -6,7 +6,8 @@ const typescript = require('rollup-plugin-typescript');
 const postcss = require('rollup-plugin-postcss');
 const autoprefixer = require('autoprefixer');
 const resolve = require('rollup-plugin-node-resolve');
-const { uglify } = require('rollup-plugin-uglify');
+const notify = require('rollup-plugin-notify');
+const progress = require('rollup-plugin-progress');
 
 function resolveFile(filePath) {
   return path.join(__dirname, filePath);
@@ -55,7 +56,7 @@ module.exports = [
     external: ['antd', 'react'],
     plugins: [
       resolve(),
-      typescript(),
+      typescript(), // 有tsconfig.json的paths就不需要alias插件了
       babel(babelOptions),
       commonjs(),
       postcss({
@@ -64,6 +65,8 @@ module.exports = [
         extensions: ['.css', '.scss'],
         plugins: [autoprefixer],
       }),
+      notify(),
+      progress(),
       // uglify(),
     ],
   },
