@@ -5,9 +5,8 @@ const commonjs = require('rollup-plugin-commonjs');
 const typescript = require('rollup-plugin-typescript');
 const postcss = require('rollup-plugin-postcss');
 const autoprefixer = require('autoprefixer');
-const sass = require('node-sass');
-const { uglify } = require('rollup-plugin-uglify');
 const resolve = require('rollup-plugin-node-resolve');
+const { uglify } = require('rollup-plugin-uglify');
 
 function resolveFile(filePath) {
   return path.join(__dirname, filePath);
@@ -24,7 +23,11 @@ const babelOptions = {
     ],
     '@babel/preset-react',
   ],
-  plugins: ['@babel/plugin-proposal-object-rest-spread', '@babel/plugin-transform-react-jsx'],
+  plugins: [
+    '@babel/plugin-external-helpers',
+    '@babel/plugin-proposal-object-rest-spread',
+    '@babel/plugin-transform-react-jsx',
+  ],
 };
 
 const globals = {
