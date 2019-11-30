@@ -19,3 +19,5 @@ import:
 ```js
 import { EditableTable } from '@futengda/react-components';
 ```
+## License
+[MIT](https://github.com/fxxjdedd/react-components/blob/master/LICENSE)
